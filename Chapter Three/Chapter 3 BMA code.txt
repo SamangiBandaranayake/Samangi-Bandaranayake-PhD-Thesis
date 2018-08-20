@@ -1,0 +1,22 @@
+**----------BMA-----------**
+install.packages()
+library(BMS)
+
+**--------weighted-------**
+weighted=read.csv(file.choose(), header=T)
+weighted
+
+Competition = bms(weighted, burn=1000000, iter=2000000, g="UIP", mprior="uniform", nmodel=5000, mcmc="bd", user.int=FALSE)
+plot(Competition)
+summary(Competition)
+coef(Competition, order.by.pip = T, exact=T, include.constant=T)
+image(Competition, cex.axis=0.7, order.by.pip = T, yprop2pip=F)
+Competition2 = bms(weighted, burn=1000000, iter=2000000, g="BRIC", mprior="random", nmodel=5000, mcmc="bd", user.int=FALSE)
+
+
+**--------unweighted-------**
+unweighted=read.csv(file.choose(), header=T)
+unweighted
+Competition3 = bms(unweighted, burn=1000000, iter=2000000, g="UIP", mprior="uniform", nmodel=5000, mcmc="bd", user.int=FALSE)
+coef(Competition3, order.by.pip = T, exact=T, include.constant=T)
+
