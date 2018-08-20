@@ -1,0 +1,30 @@
+***************
+**// Table 5.12
+***************
+clear 
+set more off 
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+sort ID qtr
+by ID: gen D_dd= exp_dd-exp_dd[_n-1]
+egen Total_dd=total(exp_dd), by(Q)
+egen Avg_dd=mean(Total_dd), by(Q)
+gen D_Avg_dd=Avg_dd-Avg_dd[_n-1]
+gen Diff= D_Avg_dd-D_dd
+statsby e(r2), by(ID) clear : reg D_dd Diff
+rename _stat_1 r2
+gen logisticr2 =ln(r2/(1-r2))
+
+save "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\logisticr2.dta", replace
+merge 1:m ID using "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta"
+
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+xtset ID qtr
+
+winsor2 logisticr2, replace cuts(1 99)
+reg logisticr2 Hstatistic lnQ NII L_TA i.qtr, vce (cluster ID) 
+reg logisticr2 Lerner lnQ NII L_TA i.qtr, vce(cluster ID) 
+reg logisticr2 Boone_MC lnQ NII L_TA i.qtr, vce(cluster ID)
+reg logisticr2 Boone_AC lnQ NII L_TA i.qtr, vce(cluster ID)
+reg logisticr2 Hstatistic Lerner Boone_MC lnQ NII L_TA i.qtr, vce(cluster ID)
+reg logisticr2 Hstatistic Lerner Boone_AC lnQ NII L_TA i.qtr, vce(cluster ID)

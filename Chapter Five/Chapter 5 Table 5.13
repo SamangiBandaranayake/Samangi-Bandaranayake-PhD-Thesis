@@ -1,0 +1,68 @@
+***************
+**// Table 5.13
+***************
+clear
+set more off
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+merge m:1 qtr using "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\State_variables.dta"
+drop _merge
+sort ID qtr
+**//calculate change in dd
+by ID: gen D_dd= exp_dd-exp_dd[_n-1]
+save "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\CoVaR.dta", replace
+
+clear
+set more off
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\CoVaR.dta", replace
+drop bank
+egen bank=group(ID)
+sort ID qtr
+**//lagged state variables
+by ID: gen lVIX= VIX[_n-1]
+by ID: gen lSP500_return =SP500_return[_n-1]
+by ID: gen lTermspread =Termspread[_n-1]
+by ID: gen lTED =TED[_n-1]
+by ID: gen lT_bill=T_bill[_n-1]
+xtset ID qtr
+**//Regress VaR / dd on state variables at 1st and 50th percentile for each bank
+qreg D_dd lVIX lSP500_return lTermspread lTED lT_bill, quantile(50) 
+predict bD_dd, residual
+rename bD_dd medianD_dd
+qreg D_dd lVIX lSP500_return lTermspread lTED lT_bill, quantile(1)
+predict bD_dd, residual
+save "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\CoVaR1.dta", replace
+
+**//System CoVaR
+clear
+set more off
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\CoVaR1.dta", replace
+xtset ID qtr
+egen Total_dd=total(D_dd), by(Q)
+**//calculation of value weighted system distance to default(dd)
+**// value weighted system dd is common for all banks on a particular quarter
+**// value of each Q is calcuated as a percentage total value
+egen TotalRet=total(Ret)
+egen Q_TotalRet=total(Ret), by(Q)
+gen w_Total_dd=((Q_TotalRet/TotalRet)*Total_dd)
+**// system dd is caluated when the bank is at its 1st percentile
+statsby _b[bD_dd], by(ID) clear : qreg w_Total_dd bD_dd lVIX lSP500_return lTermspread lTED lT_bill  
+rename _stat_1 default
+save "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\CoVaR2.dta", replace
+merge 1:m ID using "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\CoVaR1.dta"
+sort ID qtr
+gen CoVaR=default*(bD_dd-medianD_dd) 
+
+**//CoVaR and competition
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+xtset ID qtr
+**//Correlated random effects estimation
+foreach i in Boone_MC Boone_AC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+xtreg CoVaR Hstatistic lnQ NII L_TA i.qtr,re vce(cluster ID) 
+xtreg CoVaR Lerner lnQ NII L_TA i.qtr,re vce(cluster ID) 
+xtreg CoVaR Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID) 
+xtreg CoVaR Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg CoVaR Hstatistic Lerner Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg CoVaR Hstatistic Lerner Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)

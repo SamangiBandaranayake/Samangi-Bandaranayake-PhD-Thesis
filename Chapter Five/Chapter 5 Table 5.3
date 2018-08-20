@@ -1,0 +1,18 @@
+**************
+**// Table 5.3
+**************
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+
+gen L_TA = Net_loans/TA
+gen NII =(non_int_income/(Interest_income+non_int_income))
+xtset ID qtr
+foreach i in  Boone_AC Boone_MC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+xtreg Z_score Hstatistic lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Lerner lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Hstatistic Lerner Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Hstatistic Lerner Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)

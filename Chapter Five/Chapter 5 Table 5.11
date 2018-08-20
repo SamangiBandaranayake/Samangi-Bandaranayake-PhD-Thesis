@@ -1,0 +1,42 @@
+***************
+**// Table 5.11
+***************
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen HC=Hstatistic*Concentration
+gen BC=Boone_MC*Concentration
+gen LC = Lerner*Concentration 
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+xtset ID qtr
+foreach i in Boone_MC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+drop if Year>=2016
+
+**// Z-score
+xtreg Z_score Hstatistic HC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Lerner LC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg Z_score Boone_MC BC lnQ NII L_TA i.qtr,re vce(cluster ID)
+**// NPL
+gen NPL1 = NPL/100
+xtreg NPL1 Hstatistic HC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg NPL1 Lerner LC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg NPL1 Boone_MC BC lnQ NII L_TA i.qtr,re vce(cluster ID)
+**// Distance-to-Default
+clear
+set more off
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+winsor2 exp_dd, replace cuts(1 99)
+xtset ID qtr
+foreach i in Boone_MC Boone_AC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+gen HC=Hstatistic*Concentration
+gen BC=Boone_MC*Concentration
+gen LC = Lerner*Concentration
+xtreg exp_dd Hstatistic HC lnQ NII L_TA i.qtr,re vce(cluster ID)
+xtreg exp_dd Lerner LC lnQ NII L_TA i.qtr,re vce(cluster ID) 
+xtreg exp_dd Boone_MC BC lnQ NII L_TA i.qtr,re vce(cluster ID)

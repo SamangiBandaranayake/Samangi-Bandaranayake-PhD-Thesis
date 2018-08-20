@@ -1,0 +1,469 @@
+**************
+**// Table 5.9
+**************
+**// Panel A
+**// Hstatistic
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+xtset ID qtr
+foreach i in  Boone_AC Boone_MC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg Z_score Hstatistic lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Hstatistic if sample1 == 1, detail
+gen Hstatistic1 = r(p25)
+gen Hstatistic2 = r(p50)
+gen Hstatistic3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Hstatistic lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Hstatistic0 = the mean of the original values of the H-stat variable
+gen Hstatistic0 = Hstatistic 
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of H-stat, with all the other variables evaluated at their means
+local i = 1
+foreach j in Hstatistic1 Hstatistic2 Hstatistic3 {
+replace Hstatistic = `j'
+predict ZPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ ZPred11 ZPred12 ZPred13 
+
+**// Lerner
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+xtset ID qtr
+xtreg Z_score Lerner lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Lerner if sample1 == 1, detail
+gen Lerner1 = r(p25)
+gen Lerner2 = r(p50)
+gen Lerner3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Lerner lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Lerner0 = the mean of the original values of the Lerner variable
+gen Lerner0 = Lerner
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Lerner, with all the other variables evaluated at their means
+local i = 1
+foreach j in Lerner1 Lerner2 Lerner3 {
+replace Lerner = `j'
+predict ZPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ ZPred11 ZPred12 ZPred13 
+
+**// Boone_MC
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+xtset ID qtr
+foreach i in Boone_MC{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg Z_score Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Boone_MC if sample1 == 1, detail
+gen Boone_MC1 = r(p25)
+gen Boone_MC2 = r(p50)
+gen Boone_MC3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Boone_MC lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Boone_MC0 = the mean of the original values of the Boone_MC variable
+gen Boone_MC0 = Boone_MC
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Boone_MC, with all the other variables evaluated at their means
+local i = 1
+foreach j in Boone_MC1 Boone_MC2 Boone_MC3 {
+replace Boone_MC = `j'
+predict ZPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ ZPred11 ZPred12 ZPred13 
+
+**// Boone_AC
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+foreach i in Boone_AC{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg Z_score Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Boone_AC if sample1 == 1, detail
+gen Boone_AC1 = r(p25)
+gen Boone_AC2 = r(p50)
+gen Boone_AC3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Boone_AC lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Boone_AC0 = the mean of the original values of the Boone_AC variable
+gen Boone_AC0 = Boone_AC
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Boone_AC, with all the other variables evaluated at their means
+local i = 1
+foreach j in Boone_AC1 Boone_AC2 Boone_AC3 {
+replace Boone_AC = `j'
+predict ZPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ ZPred11 ZPred12 ZPred13 
+
+**// Panel B
+**// Hstatistic
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+gen NPL1 = NPL/100
+xtset ID qtr
+foreach i in  Boone_AC Boone_MC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg NPL1 Hstatistic lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Hstatistic if sample1 == 1, detail
+gen Hstatistic1 = r(p25)
+gen Hstatistic2 = r(p50)
+gen Hstatistic3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Hstatistic lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Hstatistic0 = the mean of the original values of the H-stat variable
+gen Hstatistic0 = Hstatistic 
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of H-stat, with all the other variables evaluated at their means
+local i = 1
+foreach j in Hstatistic1 Hstatistic2 Hstatistic3 {
+replace Hstatistic = `j'
+predict NPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ NPred11 NPred12 NPred13 
+
+**// Lerner
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+gen NPL1 = NPL/100
+xtreg NPL1 Lerner lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Lerner if sample1 == 1, detail
+gen Lerner1 = r(p25)
+gen Lerner2 = r(p50)
+gen Lerner3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Lerner lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Lerner0 = the mean of the original values of the H-stat variable
+gen Lerner0 = Lerner
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Lerner, with all the other variables evaluated at their means
+local i = 1
+foreach j in Lerner1 Lerner2 Lerner3 {
+replace Lerner = `j'
+predict NPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ NPred11 NPred12 NPred13 
+
+**// Boone_MC
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+gen NPL1 = NPL/100
+xtset ID qtr
+foreach i in Boone_MC{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg NPL1 Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Boone_MC if sample1 == 1, detail
+gen Boone_MC1 = r(p25)
+gen Boone_MC2 = r(p50)
+gen Boone_MC3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Boone_MC lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Boone_MC0 = the mean of the original values of the Boone_MC variable
+gen Boone_MC0 = Boone_MC
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Boone_MC, with all the other variables evaluated at their means
+local i = 1
+foreach j in Boone_MC1 Boone_MC2 Boone_MC3 {
+replace Boone_MC = `j'
+predict NPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ NPred11 NPred12 NPred13
+
+**// Boone_AC
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+gen NPL1 = NPL/100
+foreach i in Boone_AC{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg NPL1 Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Boone_AC if sample1 == 1, detail
+gen Boone_AC1 = r(p25)
+gen Boone_AC2 = r(p50)
+gen Boone_AC3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Boone_AC lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Boone_AC0 = the mean of the original values of the Boone_AC variable
+gen Boone_AC0 = Boone_AC
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Boone_AC, with all the other variables evaluated at their means
+local i = 1
+foreach j in Boone_AC1 Boone_AC2 Boone_AC3 {
+replace Boone_AC = `j'
+predict NPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ NPred11 NPred12 NPred13 
+
+**// Panel C
+**// Hstatistic
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+winsor2 exp_dd, replace cuts(1 99)
+xtset ID qtr
+foreach i in  Boone_AC Boone_MC Hstatistic{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg exp_dd Hstatistic lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Hstatistic if sample1 == 1, detail
+gen Hstatistic1 = r(p25)
+gen Hstatistic2 = r(p50)
+gen Hstatistic3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Hstatistic lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Hstatistic0 = the mean of the original values of the H-stat variable
+gen Hstatistic0 = Hstatistic 
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of H-stat, with all the other variables evaluated at their means
+local i = 1
+foreach j in Hstatistic1 Hstatistic2 Hstatistic3 {
+replace Hstatistic = `j'
+predict DPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ DPred11 DPred12 DPred13 
+
+**// Lerner
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+winsor2 exp_dd, replace cuts(1 99)
+xtreg exp_dd Lerner lnQ NII L_TA i.qtr,re vce(cluster ID)
+
+gen sample1 = e(sample)
+
+
+summ Lerner if sample1 == 1, detail
+gen Lerner1 = r(p25)
+gen Lerner2 = r(p50)
+gen Lerner3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Lerner lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Lerner0 = the mean of the original values of the H-stat variable
+gen Lerner0 = Lerner
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Lerner, with all the other variables evaluated at their means
+local i = 1
+foreach j in Lerner1 Lerner2 Lerner3 {
+replace Lerner = `j'
+predict DPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ DPred11 DPred12 DPred13
+
+**// Boone_MC
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+winsor2 exp_dd, replace cuts(1 99)
+xtset ID qtr
+foreach i in Boone_MC{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg exp_dd Boone_MC lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Boone_MC if sample1 == 1, detail
+gen Boone_MC1 = r(p25)
+gen Boone_MC2 = r(p50)
+gen Boone_MC3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Boone_MC lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Boone_MC0 = the mean of the original values of the Boone_MC variable
+gen Boone_MC0 = Boone_MC
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Boone_MC0, with all the other variables evaluated at their means
+local i = 1
+foreach j in Boone_MC1 Boone_MC2 Boone_MC3 {
+replace Boone_MC = `j'
+predict DPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ DPred11 DPred12 DPred13 
+
+**// Boone_AC
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+winsor2 exp_dd, replace cuts(1 99)
+xtset ID qtr
+foreach i in Boone_AC{
+bysort ID: egen `i'bar=mean(`i')
+}
+
+xtreg exp_dd Boone_AC lnQ NII L_TA i.qtr,re vce(cluster ID)
+gen sample1 = e(sample)
+
+
+summ Boone_AC if sample1 == 1, detail
+gen Boone_AC1 = r(p25)
+gen Boone_AC2 = r(p50)
+gen Boone_AC3 = r(p75)
+
+
+// In this do-loop, all the variable values are replaced with their mean values
+foreach i in Boone_AC lnQ NII L_TA {
+summ `i' if sample1==1
+replace `i'=r(mean)
+}
+
+// Boone_AC0 = the mean of the original values of the Boone_AC variable
+gen Boone_AC0 = Boone_AC
+
+// In this do-loop, predicted probabilities are calculated for the 25th, 50th, and 75th percentile
+// values of Boone_AC, with all the other variables evaluated at their means
+local i = 1
+foreach j in Boone_AC1 Boone_AC2 Boone_AC3 {
+replace Boone_AC = `j'
+predict DPred1`i' if sample1 == 1
+local i=`i'+1
+}
+summ DPred11 DPred12 DPred13
+
+
+

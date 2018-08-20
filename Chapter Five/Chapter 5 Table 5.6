@@ -1,0 +1,21 @@
+**************
+**// Table 5.6
+**************
+clear
+set more off
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\D_D.dta", replace
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen L_TA = Net_loans/TA
+winsor2 exp_dd, replace cuts(1 99)
+glm exp_dd Hstatistic lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm exp_dd Lerner lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm exp_dd Boone_MC lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm exp_dd Boone_AC lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm exp_dd Hstatistic Lerner Boone_MC lnQ NII L_TA i.qtr,family(binomial) ///
+link(logit) vce(cluster ID) nolog
+glm exp_dd Hstatistic Lerner Boone_AC lnQ NII L_TA i.qtr,family(binomial) ///
+link(logit) vce(cluster ID) nolog

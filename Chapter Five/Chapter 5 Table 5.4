@@ -1,0 +1,21 @@
+**************
+**// Table 5.4
+**************
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+
+gen L_TA = Net_loans/TA
+gen NII =(non_int_income/(Interest_income+non_int_income))
+gen NPL1 = NPL/100
+glm NPL1 Hstatistic lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm NPL1 Lerner lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm NPL1 Boone_MC lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm NPL1 Boone_AC lnQ NII L_TA i.qtr,family(binomial) link(logit) ///
+vce(cluster ID) nolog
+glm NPL1 Hstatistic Lerner Boone_MC lnQ NII L_TA i.qtr,family(binomial) ///
+link(logit) vce(cluster ID) nolog
+glm NPL1 Hstatistic Lerner Boone_AC lnQ NII L_TA i.qtr,family(binomial) ///
+link(logit) vce(cluster ID) nolog

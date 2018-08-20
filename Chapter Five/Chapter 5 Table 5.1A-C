@@ -1,0 +1,24 @@
+****************
+**// Table 5.1A
+****************
+clear
+use "\\file\UsersS$\sba144\Home\Desktop\Chapter Three\Accounting_data.dta", replace
+
+gen L_TA = Net_loans/TA
+gen NII =(non_int_income/(Interest_income+non_int_income))
+pwcorr Hstatistic Lerner Boone_MC, sig obs
+***************
+**// Table 5.1B
+***************
+glm Z_score Lerner Boone_MC Hstatistic lnQ NII L_TA i.qtr,family(binomial) link(logit) vce(cluster ID) nolog
+gen a=e(sample)
+drop if a==0
+pwcorr Hstatistic Lerner Boone_MC if a==1, sig obs
+***************
+**// Table 5.1C
+***************
+glm Z_score Lerner Boone_AC Hstatistic lnQ NII L_TA i.qtr,family(binomial) link(logit) vce(cluster ID) nolog
+gen b=e(sample)
+drop if b==0
+pwcorr Hstatistic Lerner Boone_AC if b==1, sig obs
+
